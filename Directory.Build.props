@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Avalonia 12.1 analyzers were built with a newer Roslyn than the pinned .NET 8 SDK. -->
+    <NoWarn>$(NoWarn);CS9057</NoWarn>
+  </PropertyGroup>
+</Project>

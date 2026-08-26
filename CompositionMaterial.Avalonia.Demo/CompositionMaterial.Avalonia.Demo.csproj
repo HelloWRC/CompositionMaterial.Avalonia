@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="[12.1.1]" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="[12.1.1]" />
+    <ProjectReference Include="..\CompositionMaterial.Avalonia\CompositionMaterial.Avalonia.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(PublishTrimmed)' == 'true'">
+    <!-- ProjectReference builds do not import the NuGet package's buildTransitive target. -->
+    <TrimmerRootDescriptor Include="..\CompositionMaterial.Avalonia\ILLink.Descriptors.xml" />
+  </ItemGroup>
+</Project>

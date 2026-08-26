@@ -4,6 +4,28 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
+        <PackageId>CompositionMaterial.Avalonia</PackageId>
+        <Description>WinUI Composition backed, shape-clipped materials for Avalonia.</Description>
+        <PackageTags>avalonia;composition;acrylic;mica;reveal;material</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Version>0.1.0</Version>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="[12.1.1]" />
+        <PackageReference Include="Avalonia.Win32" Version="[12.1.1]" />
+        <PackageReference Include="MicroCom.Runtime" Version="[0.11.6]" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <TrimmerRootDescriptor Include="ILLink.Descriptors.xml" />
+        <None Include="ILLink.Descriptors.xml" Pack="true" PackagePath="buildTransitive/CompositionMaterial.Avalonia.ILLink.Descriptors.xml" />
+        <None Include="buildTransitive\CompositionMaterial.Avalonia.targets" Pack="true" PackagePath="buildTransitive/CompositionMaterial.Avalonia.targets" />
+        <None Include="..\README.md" Pack="true" PackagePath="README.md" />
+    </ItemGroup>
 
 </Project>

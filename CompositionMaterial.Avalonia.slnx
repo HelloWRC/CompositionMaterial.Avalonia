@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="CompositionMaterial.Avalonia/CompositionMaterial.Avalonia.csproj" />
+  <Project Path="CompositionMaterial.Avalonia.Demo/CompositionMaterial.Avalonia.Demo.csproj" />
+  <Project Path="CompositionMaterial.Avalonia.Tests/CompositionMaterial.Avalonia.Tests.csproj" />
 </Solution>
