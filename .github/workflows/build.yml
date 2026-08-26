@@ -1,0 +1,147 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build_nupkg:
+    name: Build NuGet package
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ./CompositionMaterial.Avalonia.sln
+
+      - name: Test
+        run: dotnet test ./CompositionMaterial.Avalonia.sln --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        shell: pwsh
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          $packageVersionArgs = @()
+
+          if ($env:REF_TYPE -eq 'tag') {
+            if (-not $env:REF_NAME.StartsWith('v')) {
+              throw "Release tag '$env:REF_NAME' must start with 'v'."
+            }
+
+            $packageVersion = $env:REF_NAME.Substring(1)
+            if ([string]::IsNullOrWhiteSpace($packageVersion)) {
+              throw 'The release tag must contain a package version after the leading v.'
+            }
+
+            $packageVersionArgs += "-p:PackageVersion=$packageVersion"
+          }
+
+          dotnet pack ./CompositionMaterial.Avalonia/CompositionMaterial.Avalonia.csproj `
+            --configuration Release `
+            --no-restore `
+            --output ./artifacts/nuget `
+            @packageVersionArgs
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Validate NuGet artifacts
+        shell: pwsh
+        run: |
+          $packages = @(Get-ChildItem ./artifacts/nuget -Filter *.nupkg -File)
+          $symbolPackages = @(Get-ChildItem ./artifacts/nuget -Filter *.snupkg -File)
+
+          if ($packages.Count -ne 1) {
+            throw "Expected exactly one .nupkg file, found $($packages.Count)."
+          }
+
+          if ($symbolPackages.Count -ne 1) {
+            throw "Expected exactly one .snupkg file, found $($symbolPackages.Count)."
+          }
+
+      - name: Upload NuGet artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget-package
+          path: |
+            ./artifacts/nuget/*.nupkg
+            ./artifacts/nuget/*.snupkg
+          if-no-files-found: error
+
+  publish_nupkg:
+    name: Publish NuGet package
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    needs: build_nupkg
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download NuGet artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: nuget-package
+          path: ./artifacts/nuget
+
+      - name: Validate NuGet artifacts
+        shell: pwsh
+        run: |
+          $packages = @(Get-ChildItem ./artifacts/nuget -Filter *.nupkg -File)
+          $symbolPackages = @(Get-ChildItem ./artifacts/nuget -Filter *.snupkg -File)
+
+          if ($packages.Count -ne 1) {
+            throw "Expected exactly one .nupkg file, found $($packages.Count)."
+          }
+
+          if ($symbolPackages.Count -ne 1) {
+            throw "Expected exactly one .snupkg file, found $($symbolPackages.Count)."
+          }
+
+      - name: NuGet login with trusted publishing
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push package to NuGet.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          $package = Get-ChildItem ./artifacts/nuget -Filter *.nupkg -File -ErrorAction Stop | Select-Object -First 1
+
+          dotnet nuget push $package.FullName `
+            --api-key $env:NUGET_API_KEY `
+            --source https://api.nuget.org/v3/index.json `
+            --skip-duplicate
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }

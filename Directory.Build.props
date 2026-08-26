@@ -2,5 +2,10 @@
   <PropertyGroup>
     <!-- Avalonia 12.1 analyzers were built with a newer Roslyn than the pinned .NET 8 SDK. -->
     <NoWarn>$(NoWarn);CS9057</NoWarn>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <DebugType>portable</DebugType>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 </Project>

@@ -8,9 +8,17 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IsPackable>true</IsPackable>
         <PackageId>CompositionMaterial.Avalonia</PackageId>
+        <Authors>HelloWRC</Authors>
+        <Copyright>Copyright (c) 2026 HelloWRC</Copyright>
         <Description>WinUI Composition backed, shape-clipped materials for Avalonia.</Description>
         <PackageTags>avalonia;composition;acrylic;mica;reveal;material</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/HelloWRC/CompositionMaterial.Avalonia</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/HelloWRC/CompositionMaterial.Avalonia</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Version>0.1.0</Version>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
@@ -19,6 +27,7 @@
         <PackageReference Include="Avalonia" Version="[12.1.1]" />
         <PackageReference Include="Avalonia.Win32" Version="[12.1.1]" />
         <PackageReference Include="MicroCom.Runtime" Version="[0.11.6]" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
