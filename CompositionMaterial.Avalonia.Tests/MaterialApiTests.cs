@@ -8,10 +8,11 @@ using Xunit;
 
 namespace CompositionMaterial.Avalonia.Tests;
 
-public sealed class MaterialApiTests
+[Collection(AvaloniaTestCollection.Name)]
+public sealed class MaterialApiTests(AvaloniaTestFixture fixture)
 {
     [Fact]
-    public void Control_starts_in_fallback_mode()
+    public Task Control_starts_in_fallback_mode() => fixture.RunAsync(() =>
     {
         var control = new CompositionMaterialControl
         {
@@ -22,10 +23,10 @@ public sealed class MaterialApiTests
         Assert.Equal(MaterialRenderingMode.Fallback, control.ActualRenderingMode);
         Assert.False(control.IsNativeMaterialActive);
         Assert.Same(Brushes.Red, control.FallbackBrush);
-    }
+    });
 
     [Fact]
-    public void Preset_values_are_coerced_to_safe_ranges()
+    public Task Preset_values_are_coerced_to_safe_ranges() => fixture.RunAsync(() =>
     {
         var acrylic = new AcrylicMaterial
         {
@@ -51,20 +52,20 @@ public sealed class MaterialApiTests
         Assert.Equal(0, liquid.EdgeIntensity);
         Assert.Equal(0, liquid.EdgeDepth);
         Assert.Equal(1, liquid.ChromaticAberration);
-    }
+    });
 
     [Fact]
-    public void Graph_validator_detects_cycles()
+    public Task Graph_validator_detects_cycles() => fixture.RunAsync(() =>
     {
         var blur = new GaussianBlurBrushNode();
         blur.Source = blur;
 
         var exception = Assert.Throws<InvalidOperationException>(() => MaterialGraph.Validate(blur));
         Assert.Contains("cycle", exception.Message, StringComparison.OrdinalIgnoreCase);
-    }
+    });
 
     [Fact]
-    public void Graph_search_finds_nested_backdrop_and_blur()
+    public Task Graph_search_finds_nested_backdrop_and_blur() => fixture.RunAsync(() =>
     {
         var graph = new TintBrushNode
         {
@@ -76,10 +77,10 @@ public sealed class MaterialApiTests
 
         Assert.True(MaterialGraph.Contains<GaussianBlurBrushNode>(graph));
         Assert.Equal(BackdropKind.HostBackdrop, MaterialGraph.FindBackdrop(graph));
-    }
+    });
 
     [Fact]
-    public void Nested_graph_changes_are_observed()
+    public Task Nested_graph_changes_are_observed() => fixture.RunAsync(() =>
     {
         var tint = new TintBrushNode { Source = new BackdropBrushNode() };
         var material = new CustomCompositionMaterial { RootBrush = tint };
@@ -89,10 +90,10 @@ public sealed class MaterialApiTests
         tint.Opacity = 0.25;
 
         Assert.Equal(1, changes);
-    }
+    });
 
     [Fact]
-    public void Dip_translation_is_scaled_to_native_pixels()
+    public Task Dip_translation_is_scaled_to_native_pixels() => fixture.RunAsync(() =>
     {
         var matrix = Matrix.CreateTranslation(12.5, -4.25) * Matrix.CreateScale(1.2, 0.8);
         var native = NativeTransformMath.ToPixels(matrix, 1.5);
@@ -101,16 +102,16 @@ public sealed class MaterialApiTests
         Assert.Equal((float)matrix.M22, native.M22, 4);
         Assert.Equal((float)(matrix.M31 * 1.5), native.M41, 4);
         Assert.Equal((float)(matrix.M32 * 1.5), native.M42, 4);
-    }
+    });
 
     [Fact]
-    public void Avalonia_1211_private_contract_is_resolvable()
+    public Task Avalonia_1211_private_contract_is_resolvable() => fixture.RunAsync(() =>
     {
         Assert.NotNull(WinUiAbi.TryCreate());
-    }
+    });
 
     [Fact]
-    public void Custom_material_can_be_declared_in_xaml()
+    public Task Custom_material_can_be_declared_in_xaml() => fixture.RunAsync(() =>
     {
         const string xaml = """
             <cm:CompositionMaterialControl
@@ -137,5 +138,5 @@ public sealed class MaterialApiTests
         var tint = Assert.IsType<TintBrushNode>(custom.RootBrush);
         Assert.IsType<GaussianBlurBrushNode>(tint.Source);
         Assert.Equal(new CornerRadius(18), result.CornerRadius);
-    }
+    });
 }

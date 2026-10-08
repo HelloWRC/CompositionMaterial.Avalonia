@@ -1,27 +1,19 @@
 using System.Numerics;
 using Avalonia;
-using Avalonia.Headless;
 using Avalonia.Media;
 using CompositionMaterial.Avalonia.Platform.Windows;
 using Xunit;
 
 namespace CompositionMaterial.Avalonia.Tests;
 
-public class GeometryTestApplication
+[Collection(AvaloniaTestCollection.Name)]
+public class NativeGeometryTests(AvaloniaTestFixture fixture)
 {
-    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<Application>().UseSkia()
-        .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
-}
-
-public class NativeGeometryTests
-{
-    private static readonly HeadlessUnitTestSession Session = HeadlessUnitTestSession.StartNew(typeof(GeometryTestApplication));
-
     [Fact]
     public async Task Native_clip_preserves_the_tip_and_excludes_the_bounding_rectangle()
     {
         if (!OperatingSystem.IsWindows()) return;
-        await Session.Dispatch(() =>
+        await fixture.RunAsync(() =>
         {
             var body = new RectangleGeometry(new Rect(0, 10, 325, 40), 8, 8);
             var tip = Geometry.Parse("M 152.5,10 L 162.5,0 L 172.5,10 Z");
@@ -32,14 +24,14 @@ public class NativeGeometryTests
             Assert.True(Direct2DPath.Contains(native.DangerousGetHandle(), new Vector2(162.5f, 30)));
             Assert.False(Direct2DPath.Contains(native.DangerousGetHandle(), new Vector2(20, 5)));
             Assert.False(Direct2DPath.Contains(native.DangerousGetHandle(), new Vector2(1, 11)));
-        }, CancellationToken.None);
+        });
     }
 
     [Fact]
     public async Task Native_clip_matches_transformed_curves_at_monitor_scaling()
     {
         if (!OperatingSystem.IsWindows()) return;
-        await Session.Dispatch(() =>
+        await fixture.RunAsync(() =>
         {
             var clip = Geometry.Parse("M 0,20 C 0,0 40,0 40,20 Q 20,50 0,20 Z");
             clip.Transform = new TranslateTransform(12, 7);
@@ -54,16 +46,16 @@ public class NativeGeometryTests
                         new Vector2((float)(point.X * 1.5), (float)(point.Y * 1.5)));
                     Assert.True(expected == actual, $"Point {point}: expected={expected}, native={actual}");
                 }
-        }, CancellationToken.None);
+        });
     }
 
     [Fact]
-    public void Explicit_clip_is_not_overwritten_by_corner_radius_or_bounds_updates()
+    public Task Explicit_clip_is_not_overwritten_by_corner_radius_or_bounds_updates() => fixture.RunAsync(() =>
     {
         var clip = new RectangleGeometry(new Rect(10, 10, 30, 20));
         var control = new CompositionMaterialControl { Clip = clip, CornerRadius = new CornerRadius(12) };
         control.CornerRadius = new CornerRadius(20);
         Assert.Same(clip, control.Clip);
         Assert.Same(clip, control.NativeClipGeometry);
-    }
+    });
 }
