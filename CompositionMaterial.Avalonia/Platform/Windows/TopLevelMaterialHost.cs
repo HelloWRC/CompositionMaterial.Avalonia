@@ -320,7 +320,19 @@ internal sealed class TopLevelMaterialHost : IDisposable
             var size = new Vector2((float)(Control.Bounds.Width * scaling), (float)(Control.Bounds.Height * scaling));
             var corner = Control.CornerRadius;
             var radius = Math.Max(Math.Max(corner.TopLeft, corner.TopRight), Math.Max(corner.BottomRight, corner.BottomLeft));
-            Native.UpdateGeometry(size, (float)(radius * scaling));
+            try
+            {
+                if (!IsNativeActive)
+                    RefreshMaterial();
+                Native.UpdateGeometry(size, (float)(radius * scaling), Control.NativeClipGeometry, (float)scaling);
+            }
+            catch (Exception exception)
+            {
+                MaterialDiagnostics.Write($"native geometry clip failed: {exception}");
+                IsNativeActive = false;
+                Native.UpdateFrame(Matrix4x4.Identity, 0, false);
+                Control.SetPlatformMode(MaterialRenderingMode.Fallback);
+            }
         }
 
         private void EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)

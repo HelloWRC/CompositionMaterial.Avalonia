@@ -50,6 +50,7 @@ public class CompositionMaterialControl : Decorator
     private Point _pointer;
     private bool _pointerOver;
     private RectangleGeometry? _roundedClip;
+    private Geometry? _observedClip;
     private int _attachAttempt;
     private bool _attachFramePending;
 
@@ -91,6 +92,8 @@ public class CompositionMaterialControl : Decorator
     public MaterialRenderingMode ActualRenderingMode => _actualRenderingMode;
     public bool IsNativeMaterialActive => _isNativeMaterialActive;
 
+    internal Geometry? NativeClipGeometry => ReferenceEquals(Clip, _roundedClip) ? null : Clip;
+
     public override void Render(DrawingContext context)
     {
         var rect = new Rect(Bounds.Size);
@@ -108,6 +111,7 @@ public class CompositionMaterialControl : Decorator
         base.OnAttachedToVisualTree(e);
         ObserveMaterial(Material);
         UpdateRoundedClip();
+        ObserveClip(Clip);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -132,6 +136,7 @@ public class CompositionMaterialControl : Decorator
         _attachment = null;
         _attachFramePending = false;
         ObserveMaterial(null);
+        ObserveClip(null);
         SetPlatformMode(MaterialRenderingMode.Fallback);
         base.OnDetachedFromVisualTree(e);
     }
@@ -146,6 +151,16 @@ public class CompositionMaterialControl : Decorator
             _attachment?.MaterialChanged();
         }
         else if (change.Property == BoundsProperty || change.Property == CornerRadiusProperty)
+        {
+            UpdateRoundedClip();
+            _attachment?.GeometryChanged();
+        }
+        else if (change.Property == ClipProperty)
+        {
+            ObserveClip(Clip);
+            _attachment?.GeometryChanged();
+        }
+        else if (change.Property == ClipToBoundsProperty)
         {
             UpdateRoundedClip();
             _attachment?.GeometryChanged();
@@ -226,6 +241,8 @@ public class CompositionMaterialControl : Decorator
 
     private void UpdateRoundedClip()
     {
+        if (Clip is not null && !ReferenceEquals(Clip, _roundedClip))
+            return;
         if (!ClipToBounds)
         {
             if (ReferenceEquals(Clip, _roundedClip))
@@ -241,6 +258,21 @@ public class CompositionMaterialControl : Decorator
         _roundedClip.RadiusY = maxRadius;
         if (!ReferenceEquals(Clip, _roundedClip))
             Clip = _roundedClip;
+    }
+
+    private void ObserveClip(Geometry? clip)
+    {
+        if (_observedClip is not null)
+            _observedClip.Changed -= ClipGeometryChanged;
+        _observedClip = clip;
+        if (_observedClip is not null)
+            _observedClip.Changed += ClipGeometryChanged;
+    }
+
+    private void ClipGeometryChanged(object? sender, EventArgs e)
+    {
+        _attachment?.GeometryChanged();
+        InvalidateVisual();
     }
 
     private void TryAttach()

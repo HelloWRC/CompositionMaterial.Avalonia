@@ -1,5 +1,6 @@
 <linker>
   <assembly fullname="Avalonia.Base">
+    <type fullname="Avalonia.Media.Geometry" preserve="all" />
     <type fullname="Avalonia.Rendering.Composition.CompositionVisual" preserve="all" />
     <type fullname="Avalonia.Rendering.Composition.Compositor" preserve="all" />
     <type fullname="Avalonia.Rendering.Composition.Server.SimpleServerObject" preserve="all" />
@@ -8,4 +9,5 @@
     <type fullname="Avalonia.Rendering.Composition.Server.ServerCompositorAnimations" preserve="all" />
   </assembly>
   <assembly fullname="Avalonia.Win32" preserve="all" />
+  <assembly fullname="Avalonia.Skia" preserve="all" />
 </linker>

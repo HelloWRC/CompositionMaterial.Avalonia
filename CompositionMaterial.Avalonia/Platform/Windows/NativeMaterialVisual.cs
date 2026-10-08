@@ -4,6 +4,7 @@ using CompositionMaterial.Avalonia.Materials;
 using MaterialDefinition = CompositionMaterial.Avalonia.Materials.CompositionMaterial;
 using CompositionMaterial.Avalonia.Internal;
 using System.Diagnostics.CodeAnalysis;
+using Avalonia.Media;
 
 namespace CompositionMaterial.Avalonia.Platform.Windows;
 
@@ -25,6 +26,7 @@ internal sealed class NativeMaterialVisual : IDisposable
     private object? _frostSprite;
     private object? _frostVisual;
     private object? _clipGeometry;
+    private object? _pathClip;
     private Matrix4x4 _lastTransform;
     private Vector2 _lastSize;
     private float _lastOpacity = -1;
@@ -71,7 +73,7 @@ internal sealed class NativeMaterialVisual : IDisposable
         }
     }
 
-    public void UpdateGeometry(Vector2 size, float radius)
+    public void UpdateGeometry(Vector2 size, float radius, Geometry? clip = null, float scale = 1)
     {
         if (_disposed)
             return;
@@ -83,6 +85,34 @@ internal sealed class NativeMaterialVisual : IDisposable
                 if (_frostVisual is not null)
                     _setSize(_frostVisual, size);
                 _lastSize = size;
+            }
+
+            if (clip is not null)
+            {
+                var pathClip = NativePathClip.Create(_abi, _owner.Compositor, clip, scale);
+                object? clipInterface = null;
+                try
+                {
+                    clipInterface = _abi.QueryInterface(pathClip, _abi.RequireWin32Type("Avalonia.Win32.WinRT.ICompositionClip"));
+                    WinUiAbi.RequireMethod(_abi.IVisualType, "SetClip", 1).Invoke(_visual, [clipInterface]);
+                    NativeWindowContext.DisposeProxy(_pathClip);
+                    _pathClip = pathClip;
+                    pathClip = null!;
+                }
+                finally
+                {
+                    NativeWindowContext.DisposeProxy(clipInterface);
+                    NativeWindowContext.DisposeProxy(pathClip);
+                }
+                return;
+            }
+
+            if (_pathClip is not null)
+            {
+                NativeWindowContext.DisposeProxy(_pathClip);
+                _pathClip = null;
+                NativeWindowContext.DisposeProxy(_clipGeometry);
+                _clipGeometry = null;
             }
 
             if (_clipGeometry is null)
@@ -158,6 +188,7 @@ internal sealed class NativeMaterialVisual : IDisposable
             return;
         _disposed = true;
         RemoveFrostLayer();
+        NativeWindowContext.DisposeProxy(_pathClip);
         NativeWindowContext.DisposeProxy(_clipGeometry);
         NativeWindowContext.DisposeProxy(_brush);
         NativeWindowContext.DisposeProxy(_visual);
