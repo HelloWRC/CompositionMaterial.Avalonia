@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CompositionMaterial.Avalonia.Platform.Windows;
 
 /// <summary>
-/// Resolves the exact Avalonia 12.1.1 private ABI used by the Windows material host.
+/// Resolves the exact Avalonia 12.1.4 private ABI used by the Windows material host.
 /// All failures are converted to an unavailable backend.
 /// </summary>
 [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The package ships an ILLink descriptor for the pinned Avalonia assemblies.")]
@@ -18,7 +18,7 @@ namespace CompositionMaterial.Avalonia.Platform.Windows;
 [UnconditionalSuppressMessage("Trimming", "IL2070", Justification = "The reflected members are preserved by the package descriptor.")]
 internal sealed class WinUiAbi
 {
-    private const string ExpectedVersion = "12.1.1.0";
+    private const string ExpectedVersion = "12.1.4.0";
     private readonly Assembly _win32;
     private readonly Assembly _base;
     private readonly MethodInfo _queryInterface;

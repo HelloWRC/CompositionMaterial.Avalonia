@@ -26,7 +26,7 @@ Liquid Glass is an approximation built from blur, tint, noise, edge highlights, 
 
 - **Windows only.** The fallback path is a safety net, not a supported cross-platform implementation.
 - The .NET 8 SDK and a `net8.0` application.
-- **Exactly** Avalonia and Avalonia.Win32 12.1.1.
+- **Exactly** Avalonia and Avalonia.Win32 12.1.4.
 - A transparent window and transparent Avalonia ancestors behind every material region.
 - NativeAOT is not supported. Trimmed desktop builds are supported through the included linker descriptor.
 
@@ -159,13 +159,13 @@ Implicit animations, including `this.FinalValue`, are tracked as well. The libra
 
 ## Limitations
 
-- The project relies on private Avalonia 12.1.1 rendering lifecycle and WinUI bridge details. Any Avalonia internal change can break some or all functionality.
+- The project relies on private Avalonia 12.1.4 rendering lifecycle and WinUI bridge details. Any Avalonia internal change can break some or all functionality.
 - Only Windows is supported. A non-Windows environment, or an unavailable or mismatched native backend, falls back to `FallbackBrush` where possible.
 - The material samples the desktop/window backdrop, not Avalonia content in the same swapchain.
 - An opaque Avalonia parent covers the native material; the library cannot punch a transparent hole through pixels Avalonia has already rendered.
 - Per-corner radii are accepted, but the native and child clips currently use the largest value as a uniform conservative radius on the pinned backend.
 - Liquid Glass does not implement real displacement, refraction, or chromatic dispersion.
-- Avalonia 12.1.1 exposes its validated system Acrylic recipe rather than arbitrary animatable Win2D effect properties. `BlurAmount` and `Saturation` select and describe that recipe, but the exact native blur kernel remains controlled by Avalonia's pinned implementation.
+- Avalonia 12.1.4 exposes its validated system Acrylic recipe rather than arbitrary animatable Win2D effect properties. `BlurAmount` and `Saturation` select and describe that recipe, but the exact native blur kernel remains controlled by Avalonia's pinned implementation.
 - NativeAOT is unsupported.
 
 ## Development

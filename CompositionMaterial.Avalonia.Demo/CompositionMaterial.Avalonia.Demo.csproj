@@ -6,8 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" Version="[12.1.1]" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="[12.1.1]" />
+    <PackageReference Include="Avalonia.Desktop" Version="[12.1.4]" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="[12.1.4]" />
     <ProjectReference Include="..\CompositionMaterial.Avalonia\CompositionMaterial.Avalonia.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(PublishTrimmed)' == 'true'">

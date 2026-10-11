@@ -26,7 +26,7 @@ Liquid Glass 通过模糊、着色、噪声、边缘高光和指针光效模拟�
 
 - **仅支持 Windows。** 回退路径仅用于故障保护，不代表项目支持跨平台运行。
 - .NET 8 SDK，以及以 `net8.0` 为目标框架的应用。
-- **必须精确使用** Avalonia 和 Avalonia.Win32 12.1.1。
+- **必须精确使用** Avalonia 和 Avalonia.Win32 12.1.4。
 - 每个材质区域所在的窗口，以及该区域后方的所有 Avalonia 祖先元素，都必须保持透明。
 - 不支持 NativeAOT；经裁剪的桌面应用则可通过内置的链接器描述文件获得支持。
 
@@ -159,13 +159,13 @@ visual.StartAnimation("Scale", scale);
 
 ## 限制
 
-- 本项目依赖 Avalonia 12.1.1 的私有渲染生命周期及 WinUI 桥接细节。Avalonia 的任何内部变更都可能破坏部分或全部功能。
+- 本项目依赖 Avalonia 12.1.4 的私有渲染生命周期及 WinUI 桥接细节。Avalonia 的任何内部变更都可能破坏部分或全部功能。
 - 仅支持 Windows。在非 Windows 环境中，或原生后端不可用、ABI 不匹配时，会尽可能回退至 `FallbackBrush`。
 - 材质采样的是桌面/窗口背景，而不是同一个交换链中的 Avalonia 内容。
 - 不透明的 Avalonia 父元素会遮住原生材质；本库无法在 Avalonia 已绘制的像素中打出透明孔洞。
 - 可以分别为四个角传入不同的圆角值，但当前固定版本后端的原生裁剪与子元素裁剪会取其中的最大值，作为统一且保守的圆角值。
 - Liquid Glass 不实现真实的位移、折射或色散。
-- Avalonia 12.1.1 暴露的是经过验证的系统 Acrylic 配方，而非可任意动画化的 Win2D 效果属性。`BlurAmount` 和 `Saturation` 用于选择并描述该配方，但具体的原生模糊核仍由固定版本的 Avalonia 实现控制。
+- Avalonia 12.1.4 暴露的是经过验证的系统 Acrylic 配方，而非可任意动画化的 Win2D 效果属性。`BlurAmount` 和 `Saturation` 用于选择并描述该配方，但具体的原生模糊核仍由固定版本的 Avalonia 实现控制。
 - 不支持 NativeAOT。
 
 ## 开发

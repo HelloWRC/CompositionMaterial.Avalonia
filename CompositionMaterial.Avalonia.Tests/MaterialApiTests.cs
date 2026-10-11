@@ -105,7 +105,7 @@ public sealed class MaterialApiTests(AvaloniaTestFixture fixture)
     });
 
     [Fact]
-    public Task Avalonia_1211_private_contract_is_resolvable() => fixture.RunAsync(() =>
+    public Task Avalonia_1214_private_contract_is_resolvable() => fixture.RunAsync(() =>
     {
         Assert.NotNull(WinUiAbi.TryCreate());
     });

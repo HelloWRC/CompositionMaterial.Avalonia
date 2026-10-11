@@ -12,8 +12,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="[12.1.1]" />
-    <PackageReference Include="Avalonia.Headless" Version="[12.1.1]" />
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="[12.1.4]" />
+    <PackageReference Include="Avalonia.Headless" Version="[12.1.4]" />
     <ProjectReference Include="..\CompositionMaterial.Avalonia\CompositionMaterial.Avalonia.csproj" />
   </ItemGroup>
 </Project>
